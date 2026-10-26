@@ -166,10 +166,10 @@
           <label for="marca">Marca <span class="req">*</span></label>
           <select id="marca" name="marca">
             <option value="" disabled selected>Seleccionar marca</option>
-            <option>BENELLI</option><option>DAYUN</option><option>FREEDOM</option>
+            <option>BENELLI</option><option>DAYUN</option><option>FREEDOM</option><option>GENESIS</option>
             <option>HAOJUE</option><option>HERO</option><option>HONDA</option>
             <option>KATANA</option><option>KAYO</option><option>KEEWAY</option>
-            <option>TVS</option><option>UM</option><option>YAMAHA</option><option>ZONTES</option>
+            <option>SUZUKI</option><option>TVS</option><option>UM</option><option>YAMAHA</option><option>ZONTES</option>
           </select>
           <div class="error-msg" id="err-marca">&#9888; Seleccione una marca.</div>
         </div>
@@ -299,6 +299,8 @@
 </div>
 <script>
 const modelos={
+  GENESIS:["KLIK 150", "GK 125", "GKA 150 G", "GE 150-6", "BOLT 160", "CR 3 200", "SX1 150", "SX2 200", "SX3 250"],
+  SUZUKI:["AX4 110", "GSX125", "GN125F", "BURGMAN 125", "GIXXER 150 NAKED", "GIXXER 150 SF", "GIXXER 250 NAKED", "GIXXER 250 SF", "VSTROM 250 SX", "DR 200", "GSX R 150 ABS"],
   HONDA:["NAVI 110","XBLADE","CB160R","XR 150 L","CB 125 F TWISTER","XR 190 L","CBF 150S","CB100","SHADOW 150","NX 190","CB 190 R 2.0","DIO 110","ELITE 125","CB TWISTER 300","CGL 125","CB1 TUF","CRF250F","CB 190 R","CRF300L","CMX 300","NX 500","TRX 420","CB 500 F","CMX 500"],
   BENELLI:["TNT15","TNT 150","TNT 25N","180 S","TRK502X","TRK702X","302S","MC","TRK502"],
   DAYUN:["DY 125 6","DY200GY-3","DY150-22A","DY250-8","DY 150 29","DY150-16D","DY 150-29A","DY 200 9","DY 250 ZH-2","DY 150 6E","DY 150 6","MECHA 200"],
@@ -387,7 +389,7 @@ document.getElementById("lugarEntrega").addEventListener("input",function(){clea
 
 // ===== Envio verificado: solo se muestra "enviado" si el servidor confirma la fila en el Sheet =====
 const SCRIPT_URL_GLOBAL="https://script.google.com/macros/s/AKfycbzmDHG6Vny_ZIUec4E340fkihxJorjUodQAf9JwGdZo7WUkK4aWqJIbN3C_gj3klH-6/exec";
-const BACKEND_VERSION=2;
+const BACKEND_VERSION=3;
 function withTimeout(promise,ms){
   return new Promise((res,rej)=>{const t=setTimeout(()=>rej(new Error("timeout")),ms);
     promise.then(v=>{clearTimeout(t);res(v);},e=>{clearTimeout(t);rej(e);});});
@@ -406,29 +408,57 @@ function jsonp(params,ms){
     document.head.appendChild(sc);
   });
 }
-// Un intento: POST legible. Devuelve true solo si el servidor confirma la fila.
-async function trySend(payload){
-  try{
-    const r=await withTimeout(fetch(SCRIPT_URL_GLOBAL,{method:"POST",body:JSON.stringify(payload),redirect:"follow"}),25000);
-    const d=await r.json();
-    if(d && d.result==="success" && d.row) return true;
-    if(d && d.result==="duplicate" && d.row) return true;
-    return false;                       // el servidor respondio error: NO guardado
-  }catch(e){
-    // No pudimos leer la respuesta: preguntar al servidor si el registro quedo guardado
-    try{
-      const c=await jsonp({action:"check",id:payload.id},10000);
-      return !!(c && c.found);
-    }catch(e2){ return false; }
-  }
-}
-async function sendVerified(payload){
-  const waits=[0,2500,6000];
-  for(let i=0;i<waits.length;i++){
-    if(waits[i]) await new Promise(r=>setTimeout(r,waits[i]));
-    if(await trySend(payload)) return true;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+// Pregunta al servidor si el registro (por id) ya quedo escrito en el Sheet
+async function confirmSaved(id,tries){
+  for(let i=0;i<tries;i++){
+    try{ const c=await jsonp({action:"check",id:id},10000); if(c&&c.found) return true; }catch(e){}
+    if(i<tries-1) await sleep(2000);
   }
   return false;
+}
+// Camino alterno: formulario oculto hacia un iframe (no depende de fetch/CORS ni de extensiones que lo bloqueen)
+function postViaForm(payload){
+  return new Promise(res=>{
+    const name="f_"+Date.now().toString(36);
+    const ifr=document.createElement("iframe");ifr.name=name;ifr.style.display="none";
+    const f=document.createElement("form");f.method="POST";f.action=SCRIPT_URL_GLOBAL;f.target=name;f.style.display="none";
+    const i=document.createElement("input");i.type="hidden";i.name="data";i.value=JSON.stringify(payload);f.appendChild(i);
+    document.body.appendChild(ifr);document.body.appendChild(f);
+    let done=false;const end=()=>{if(done)return;done=true;setTimeout(()=>{ifr.remove();f.remove();},500);res();};
+    f.submit();ifr.onload=end;setTimeout(end,15000);
+  });
+}
+// Un intento. Devuelve {ok, code}. ok=true SOLO si el servidor confirma la fila en el Sheet.
+// Codigos: R=red/bloqueo, T=tiempo agotado, H=respuesta no valida de Google, S=error del servidor, F=camino alterno sin confirmacion
+async function trySend(payload,mode){
+  if(mode==="form"){
+    await postViaForm(payload);
+    return (await confirmSaved(payload.id,4))?{ok:true}:{ok:false,code:"F"};
+  }
+  let code="R";
+  try{
+    const r=await withTimeout(fetch(SCRIPT_URL_GLOBAL,{method:"POST",body:JSON.stringify(payload),redirect:"follow"}),30000);
+    let d;
+    try{ d=await r.json(); }catch(e){ code="H"; throw e; }
+    if(d&&(d.result==="success"||d.result==="duplicate")&&d.row) return {ok:true};
+    code="S"+(d&&d.error?":"+String(d.error).slice(0,18):"");
+  }catch(e){
+    if(e&&e.message==="timeout") code="T";
+  }
+  // no se pudo confirmar por la respuesta: preguntar al servidor si quedo guardado
+  return (await confirmSaved(payload.id,1))?{ok:true}:{ok:false,code:code};
+}
+async function sendVerified(payload,onProgress){
+  const plan=["fetch","form","fetch"], waits=[0,2000,5000], codes=[];
+  for(let i=0;i<plan.length;i++){
+    if(waits[i]) await sleep(waits[i]);
+    if(onProgress) onProgress(i+1,plan.length);
+    const r=await trySend(payload,plan[i]);
+    if(r.ok) return {ok:true,codes:codes};
+    codes.push(r.code);
+  }
+  return {ok:false,codes:codes};
 }
 // Al abrir: verificar que el servidor sea la version que confirma guardado
 (function(){
@@ -437,7 +467,7 @@ async function sendVerified(payload){
   document.addEventListener("DOMContentLoaded",()=>document.body.prepend(bar));
   window.addEventListener("load",()=>{
     jsonp({action:"ping"},12000).then(d=>{
-      if(!d||d.version!==BACKEND_VERSION||!d.sheetOk){bar.textContent="ATENCION: el sistema de registro no esta listo. No use este formulario y avise a gerencia.";bar.style.display="block";document.body.style.paddingTop=(bar.offsetHeight+24)+"px";}
+      if(!d||d.version<BACKEND_VERSION||!d.sheetOk){bar.textContent="ATENCION: el sistema de registro no esta listo. No use este formulario y avise a gerencia.";bar.style.display="block";document.body.style.paddingTop=(bar.offsetHeight+24)+"px";}
     }).catch(()=>{bar.textContent="No hay conexion con el sistema de registro. Verifique su internet antes de enviar.";bar.style.display="block";document.body.style.paddingTop=(bar.offsetHeight+24)+"px";});
   });
 })();
@@ -492,13 +522,14 @@ document.getElementById("mainForm").addEventListener("submit",e=>{
       else t.scrollIntoView({behavior:"smooth",block:"center"});
     }
     btn.textContent="Enviando y verificando...";
-    sendVerified(payload).then(ok=>{
+    sendVerified(payload,(n,t)=>{ if(n>1) btn.textContent="Reintentando ("+n+"/"+t+")... no cierre la p\u00e1gina"; }).then(res=>{
+      const ok=res.ok;
       if(ok){
         window._pendingId=null;
         resetUI();
-        showMsg("✓ Registro enviado y confirmado en el sistema.",true);
+        showMsg("\u2713 Registro enviado y confirmado en el sistema.",true);
       }else{
-        showMsg("✗ NO SE ENVIÓ. El registro NO quedó guardado. Revise su internet y presione “Reintentar envío”. Sus datos siguen en pantalla.",false);
+        showMsg("\u2717 NO SE ENVI\u00d3. El registro NO qued\u00f3 guardado. Revise su internet y presione \u201cReintentar env\u00edo\u201d. Sus datos siguen en pantalla. Si se repite, tome foto de este mensaje y env\u00edela a gerencia. C\u00f3digo: "+res.codes.join("-"),false);
       }
       btn.textContent=ok?"Registrar entrega":"Reintentar envío";
       btn.disabled=false;
