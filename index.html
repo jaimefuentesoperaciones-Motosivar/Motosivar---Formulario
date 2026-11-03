@@ -168,7 +168,7 @@
             <option value="" disabled selected>Seleccionar marca</option>
             <option>BENELLI</option><option>DAYUN</option><option>FREEDOM</option><option>GENESIS</option>
             <option>HAOJUE</option><option>HERO</option><option>HONDA</option>
-            <option>KATANA</option><option>KAYO</option><option>KEEWAY</option>
+            <option>KATANA</option><option>KAYO</option><option>KEEWAY</option><option>LINHAI</option><option>RUDE</option>
             <option>SUZUKI</option><option>TVS</option><option>UM</option><option>YAMAHA</option><option>ZONTES</option>
           </select>
           <div class="error-msg" id="err-marca">&#9888; Seleccione una marca.</div>
@@ -201,7 +201,7 @@
             <option value="" disabled selected>Seleccionar sucursal</option>
             <option>GABRIELA MISTRAL</option><option>ESCALON</option>
             <option>FREELANCER</option><option>ESCALON 1</option>
-            <option>SANTA ANA</option><option>LA MASCOTA</option>
+            <option>SANTA ANA</option>
           </select>
           <div class="error-msg" id="err-sucursal">&#9888; Seleccione una sucursal.</div>
         </div>
@@ -300,7 +300,9 @@
 <script>
 const modelos={
   GENESIS:["KLIK 150", "GK 125", "GKA 150 G", "GE 150-6", "BOLT 160", "CR 3 200", "SX1 150", "SX2 200", "SX3 250"],
-  SUZUKI:["AX4 110", "GSX125", "GN125F", "BURGMAN 125", "GIXXER 150 NAKED", "GIXXER 150 SF", "GIXXER 250 NAKED", "GIXXER 250 SF", "VSTROM 250 SX", "DR 200", "GSX R 150 ABS"],
+  LINHAI:["LANDFORCE 650L EPS EFI", "LANDFORCE 550L EPS EFI", "PROMAX ATV320 4X4 EFI", "VEHICULO ALL TERRAIN T-BOSS 550 EPS EFI 4X4", "VEHICULO ALL TERRAIN T-ARCHON 400 EFI 4X4", "M250 BASIC VERSION", "M250 BAUL VERSION", "VEHICULO DOBLE CABINA T-ARCHON 550L EFI 4X4"],
+  RUDE:["FORZZA 300CC 1 TONELADA", "ATLAS 250 CARGO+CABINA"],
+  SUZUKI:["AX4 110", "GSX125", "GN125F", "BURGMAN 125", "GIXXER 150 NAKED", "GIXXER 150 NAKED ABS", "GIXXER 150 SF", "GIXXER 150 SF ABS", "GIXXER 250 NAKED", "GIXXER 250 SF", "VSTROM 250 SX", "DR 200", "DR150", "GSX R 150 ABS"],
   HONDA:["NAVI 110","XBLADE","CB160R","XR 150 L","CB 125 F TWISTER","XR 190 L","CBF 150S","CB100","SHADOW 150","NX 190","CB 190 R 2.0","DIO 110","ELITE 125","CB TWISTER 300","CGL 125","CB1 TUF","CRF250F","CB 190 R","CRF300L","CMX 300","NX 500","TRX 420","CB 500 F","CMX 500"],
   BENELLI:["TNT15","TNT 150","TNT 25N","180 S","TRK502X","TRK702X","302S","MC","TRK502"],
   DAYUN:["DY 125 6","DY200GY-3","DY150-22A","DY250-8","DY 150 29","DY150-16D","DY 150-29A","DY 200 9","DY 250 ZH-2","DY 150 6E","DY 150 6","MECHA 200"],
@@ -308,20 +310,19 @@ const modelos={
   HAOJUE:["NK 150","DR 160 S","KA 150","VX 125","DM 125","HJ 125 8"],
   HERO:["HUNK 150 SD","HUNK 150 XTEC","ECO 150","HUNK 160 4V","HUNK 160R","IGNITOR 125","ECO DELUXE","XPULSE 200","ECO 125","HUNK 190R","XPULSE 200T","HUNK 125R 2V"],
   KATANA:["SMX 200","R1 200","SMX 150","NAVE 150","MK 1","NITRO 150","TERRA 200","SMX 250 FI","CR150 II","KN150","SCRAMBLER 250","R2-250","250-2R","TERRA 330","CR 150"],
-  KAYO:["K2 ROAD","AT 110","T4 ROAD","AU110","S200","TT125","AU150","TD 125","TS90","TS70","AY70","PIT BIKE TS90"],
+  KAYO:["K2 ROAD 250", "AT 110", "T4 ROAD 300", "AU110", "S200", "TT125", "AU150", "TD 125", "TS90", "TS70", "AY70", "PIT BIKE TS90", "ATV A50", "ATV A110 PRO", "GO KART S70", "A200", "K2 150 ENDURO", "T4 ROAD 300 VERSION 2027", "KT250 / 2 TIEMPOS"],
   KEEWAY:["KC 150","TX 200","RK 150","MINNIX 150","BLOG 150","RK 200","TX 150","K-LIGHT 202","JAMBO 200","RKV 200","RKZ 200"],
   TVS:["APACHE RTR 160","APACHE RTR 160 4V","RAIDER 125","APACHE RTR 180","APACHE RTR 200 4V","APACHE RTR 200 FI","STRYKER 125","HLX 150","NTORQ 125","APACHE RTR 200","KING KARGO","NTORQ 125 RACE","APACHE RR 310","STRYKER 3V","SPORT 100"],
-  UM:["HYPERSPORT 250","XTREET 250 SS","DSRX 200","MATRIX 200","MTX 200","FASTWIND 200X","RENEGADE LIBERTY 250","RENEGADE SPORT 200S","250 RANCH","DUTYMAX 150","MTX 150","MTX 250","ZOOM 200CC","200 RANCH","150 RANCH","XTREET RS250","MAX 150 RS","RENEGADE ST 250","SR QMR 200","SR QMT 250 EFI","SR XRAY 125","XTREET SSR 401 8V"],
+  UM:["HYPERSPORT 250", "XTREET 250 SS", "DSRX 200", "MATRIX 200", "MTX 200", "FASTWIND 200X", "RENEGADE LIBERTY 250", "DUTYMAX 150", "MTX 150", "MTX 250", "ZOOM 200CC", "200 RANCH", "MAX 150 RS", "RENEGADE ST 250", "SR QMR 200", "SR QMT 250 EFI", "SR XRAY 125", "DSRX 200 VERSION 2.0 BAUL", "DSRX 150 2.0", "XTREET 250SS 4V+TFT", "XTREET 250RS", "XTREET 401 SS 8V", "FASTWIND 200X BAUL", "RENEGADE SPORT 200", "RENEGADE LIBERTY 250 CLASSIC", "HYPERSPORT 250 4V+TFT", "CUADRIMOTO RANCH 150", "CUADRIMOTO RANCH 250", "ZOOM 200 BAUL", "BUGGY MTX PREDATOR 450", "BUGGY MTX PREDATOR 250", "TRES RUEDAS MTX 200 CARGO RANCH", "TRES RUEDAS MTX 250 CARGO RANCH"],
   YAMAHA:["YD 110 D 4","FZN 150","FZN 150 D A","SZ 150 D","XTZ 125 E","YBR 125 G","XTZ 150","YBR 125 ED","FZN 150 D AS","FZN 150 D","FZN 250 A","FZN 250","XC 115 BD","YC 150","YZF R3","MTN 320 A","YZF 320 A","YZF R7","MT 03","YZF R3A","YZF R6","CRUX REV"],
-  ZONTES:["HYPERNAKED 200-U1","SPORTNAKED 200 U","SUPER ADVENTURE 350T","ZT200-C","SCRAMBLER 350-GK","SUPER SPORT 350X","ZT200-GK","HYPERNAKED 350R","POWERCRUISE 200-C","ZT350-GK","ZT350-T","ZT350-X","ZT155T-D","ZT350-R","SCRAMBLER 200-GK"]
+  ZONTES:["HYPERNAKED 200-U1", "ZT200-C", "SCRAMBLER 350-GK", "SUPER SPORT 350X", "ZT200-GK", "HYPERNAKED 350R", "POWERCRUISE 200-C", "ZT350-GK", "ZT350-T", "ZT350-X", "ZT155T-D", "ZT350-R", "SCRAMBLER 200-GK", "SPORT NAKED 200", "ADVENTURE 350-T", "BOBBER 200", "ADVENTURE 501", "SUPERNAKED 703RR", "SUPER ADVENTURE 703F", "SCOOTER 368T"]
 };
 const asesores={
-  "GABRIELA MISTRAL":["ESMERALDA REYES","EDWIN ELIAS","JOSUE ANDRADE","JORGE PARRILLAS","DANIELA RAMIREZ","JOHANA CANALES","ANGEL SILVA","GABRIELA GUEVARA","STEPHANIE ARAGON","JOCELYN SARAVIA","ANGELA MARTIR","EFRAIN GARCIA","CAROLINA MARTIR","JULIO CERON","CAMILA IRAHETA","ISAAC VILLANUEVA"],
-  "ESCALON":["DAVID REYES","JOSE TORRES","YANETH CARBAJAL","RAFAEL HERRERAL"],
-  "FREELANCER":["MIGUEL LARA","MARLENE FIGUEROA","ISAIAS HERNANDEZ","STEPHANIE ARAGON","FABRICIO MEJIA","BRYAN HERNANDEZ"],
-  "ESCALON 1":["ABIGAIL CANALES","FREDDY ORELLANA","MARIO MURGAS","SERGIO MARTINEZ","ISAAC ALFARO","NELLY AREVALO","SANTIAGO ZAVALA","RONALD ALFARO","CHRISTIAN RAMIREZ","VIOLETA CHAVEZ","BRENDA CAMPOS","WILLIAM LANDAVERDE","ASTRID ESCOBAR","GUDIEL OMAR","ALEXIS VEGA"],
-  "SANTA ANA":["OSCAR CONTRERAS","GUILLERMO LOPEZ","JEFERSON MONCHEZ","NICOLE MARTINEZ","CLAUDIA SERRANO"],
-  "LA MASCOTA":["PEDRO ESCOBAR","EFRAIN GARCIA"]
+  "GABRIELA MISTRAL":["EFRAIN GARCIA", "ISAIAS HERNANDEZ", "JOHANA CANALES", "JORGE PARRILLAS", "JOSE TORRES", "PEDRO ESCOBAR", "ESMERALDA REYES", "ESTER RAMIREZ", "JAQUELIN CANJURA", "YANETH CARBAJAL"],
+  "ESCALON":["DAVID REYES", "CELESTE SIGUENZA", "RAFAEL HERRERA"],
+  "FREELANCER":["MIGUEL LARA", "MARLENE FIGUEROA", "FABRICIO MEJIA", "BRYAN HERNANDEZ"],
+  "ESCALON 1":["ABIGAIL CANALES", "FREDDY ORELLANA", "GUDIEL OMAR", "SANTIAGO ZAVALA", "CHRISTIAN RAMIREZ", "VIOLETA CHAVEZ", "MARIO MURGAS", "SERGIO MARTINEZ", "ASTRID ESCOBAR", "NELLY AREVALO"],
+  "SANTA ANA":["OSCAR CONTRERAS","GUILLERMO LOPEZ","JEFERSON MONCHEZ","NICOLE MARTINEZ","CLAUDIA SERRANO"]
 };
 const municipios={
   "AHUACHAPAN":["AHUACHAPAN","APANECA","ATIQUIZAYA","CONCEPCION DE ATACO","EL REFUGIO","GUAYMANGO","JUJUTLA","SAN FRANCISCO MENENDEZ","SAN LORENZO","SAN PEDRO PUXTLA","TACUBA","TURIN"],
@@ -412,10 +413,10 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 // Pregunta al servidor si el registro (por id) ya quedo escrito en el Sheet
 async function confirmSaved(id,tries){
   for(let i=0;i<tries;i++){
-    try{ const c=await jsonp({action:"check",id:id},10000); if(c&&c.found) return true; }catch(e){}
+    try{ const c=await jsonp({action:"check",id:id},10000); if(c&&c.found) return c.row||1; }catch(e){}
     if(i<tries-1) await sleep(2000);
   }
-  return false;
+  return 0;
 }
 // Camino alterno: formulario oculto hacia un iframe (no depende de fetch/CORS ni de extensiones que lo bloqueen)
 function postViaForm(payload){
@@ -434,20 +435,20 @@ function postViaForm(payload){
 async function trySend(payload,mode){
   if(mode==="form"){
     await postViaForm(payload);
-    return (await confirmSaved(payload.id,4))?{ok:true}:{ok:false,code:"F"};
+    const rf=await confirmSaved(payload.id,4); return rf?{ok:true,row:rf}:{ok:false,code:"F"};
   }
   let code="R";
   try{
     const r=await withTimeout(fetch(SCRIPT_URL_GLOBAL,{method:"POST",body:JSON.stringify(payload),redirect:"follow"}),30000);
     let d;
     try{ d=await r.json(); }catch(e){ code="H"; throw e; }
-    if(d&&(d.result==="success"||d.result==="duplicate")&&d.row) return {ok:true};
+    if(d&&(d.result==="success"||d.result==="duplicate")&&d.row) return {ok:true,row:d.row};
     code="S"+(d&&d.error?":"+String(d.error).slice(0,18):"");
   }catch(e){
     if(e&&e.message==="timeout") code="T";
   }
   // no se pudo confirmar por la respuesta: preguntar al servidor si quedo guardado
-  return (await confirmSaved(payload.id,1))?{ok:true}:{ok:false,code:code};
+  const rc=await confirmSaved(payload.id,1); return rc?{ok:true,row:rc}:{ok:false,code:code};
 }
 async function sendVerified(payload,onProgress){
   const plan=["fetch","form","fetch"], waits=[0,2000,5000], codes=[];
@@ -455,20 +456,45 @@ async function sendVerified(payload,onProgress){
     if(waits[i]) await sleep(waits[i]);
     if(onProgress) onProgress(i+1,plan.length);
     const r=await trySend(payload,plan[i]);
-    if(r.ok) return {ok:true,codes:codes};
+    if(r.ok) return {ok:true,row:r.row,codes:codes};
     codes.push(r.code);
   }
   return {ok:false,codes:codes};
 }
-// Al abrir: verificar que el servidor sea la version que confirma guardado
+// Estado del sistema: servidor listo, formulario al dia. Se revisa al abrir y al volver a la pestana.
+const CLIENT_VERSION=4;
+const PAGE_LOADED=Date.now();
+function recargarActualizado(){ location.replace(location.pathname+"?v="+Date.now()); }
+function formularioVacio(){
+  return !nombreInput.value.trim() && !duiInput.value.trim() && !telInput.value.trim() && !document.getElementById("lugarEntrega").value.trim();
+}
 (function(){
   const bar=document.createElement("div");bar.id="estadoSistema";
   bar.style.cssText="display:none;position:fixed;top:0;left:0;right:0;z-index:99;background:#b00020;color:#fff;padding:10px 14px;font:600 13px sans-serif;text-align:center";
   document.addEventListener("DOMContentLoaded",()=>document.body.prepend(bar));
-  window.addEventListener("load",()=>{
+  function mostrar(txt,color,accion){
+    bar.textContent=txt;bar.style.background=color;bar.style.cursor=accion?"pointer":"default";bar.onclick=accion||null;
+    bar.style.display="block";document.body.style.paddingTop=(bar.offsetHeight+24)+"px";
+  }
+  function ocultar(){ bar.style.display="none";document.body.style.paddingTop=""; }
+  let ultimaRevision=0;
+  function revisar(){
+    ultimaRevision=Date.now();
     jsonp({action:"ping"},12000).then(d=>{
-      if(!d||d.version<BACKEND_VERSION||!d.sheetOk){bar.textContent="ATENCION: el sistema de registro no esta listo. No use este formulario y avise a gerencia.";bar.style.display="block";document.body.style.paddingTop=(bar.offsetHeight+24)+"px";}
-    }).catch(()=>{bar.textContent="No hay conexion con el sistema de registro. Verifique su internet antes de enviar.";bar.style.display="block";document.body.style.paddingTop=(bar.offsetHeight+24)+"px";});
+      if(!d||d.version<BACKEND_VERSION||!d.sheetOk){ mostrar("ATENCION: el sistema de registro no esta listo. No use este formulario y avise a gerencia.","#b00020"); return; }
+      if(d.minClient&&CLIENT_VERSION<d.minClient){
+        if(formularioVacio()){ recargarActualizado(); return; }
+        mostrar("Hay una version nueva del formulario. Termine este envio y luego toque aqui para actualizar.","#8a5a00",recargarActualizado); return;
+      }
+      ocultar();
+    }).catch(()=>{ mostrar("No hay conexion con el sistema de registro. Verifique su internet antes de enviar.","#b00020"); });
+  }
+  window.addEventListener("load",revisar);
+  // Pestanas que quedan abiertas por horas: al volver, revisar de nuevo y recargar si esta vacia y lleva mas de 1 hora
+  document.addEventListener("visibilitychange",()=>{
+    if(document.visibilityState!=="visible") return;
+    if(Date.now()-PAGE_LOADED>3600000 && formularioVacio()){ recargarActualizado(); return; }
+    if(Date.now()-ultimaRevision>600000) revisar();
   });
 })();
 document.getElementById("mainForm").addEventListener("submit",e=>{
@@ -527,7 +553,7 @@ document.getElementById("mainForm").addEventListener("submit",e=>{
       if(ok){
         window._pendingId=null;
         resetUI();
-        showMsg("\u2713 Registro enviado y confirmado en el sistema.",true);
+        showMsg("\u2713 Registro enviado y confirmado en el sistema."+(res.row?" Qued\u00f3 en la fila "+res.row+" del Sheet.":""),true);
       }else{
         showMsg("\u2717 NO SE ENVI\u00d3. El registro NO qued\u00f3 guardado. Revise su internet y presione \u201cReintentar env\u00edo\u201d. Sus datos siguen en pantalla. Si se repite, tome foto de este mensaje y env\u00edela a gerencia. C\u00f3digo: "+res.codes.join("-"),false);
       }
