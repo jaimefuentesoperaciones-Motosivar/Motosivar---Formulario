@@ -390,7 +390,7 @@ document.getElementById("lugarEntrega").addEventListener("input",function(){clea
 
 // ===== Envio verificado: solo se muestra "enviado" si el servidor confirma la fila en el Sheet =====
 const SCRIPT_URL_GLOBAL="https://script.google.com/macros/s/AKfycbzmDHG6Vny_ZIUec4E340fkihxJorjUodQAf9JwGdZo7WUkK4aWqJIbN3C_gj3klH-6/exec";
-const BACKEND_VERSION=3;
+const BACKEND_VERSION=4;
 function withTimeout(promise,ms){
   return new Promise((res,rej)=>{const t=setTimeout(()=>rej(new Error("timeout")),ms);
     promise.then(v=>{clearTimeout(t);res(v);},e=>{clearTimeout(t);rej(e);});});
@@ -413,7 +413,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 // Pregunta al servidor si el registro (por id) ya quedo escrito en el Sheet
 async function confirmSaved(id,tries){
   for(let i=0;i<tries;i++){
-    try{ const c=await jsonp({action:"check",id:id},10000); if(c&&c.found) return c.row||1; }catch(e){}
+    try{ const c=await jsonp({action:"check",id:id},10000); if(c&&c.found) return c.pendiente?-1:(c.row||1); }catch(e){}
     if(i<tries-1) await sleep(2000);
   }
   return 0;
@@ -442,7 +442,7 @@ async function trySend(payload,mode){
     const r=await withTimeout(fetch(SCRIPT_URL_GLOBAL,{method:"POST",body:JSON.stringify(payload),redirect:"follow"}),30000);
     let d;
     try{ d=await r.json(); }catch(e){ code="H"; throw e; }
-    if(d&&(d.result==="success"||d.result==="duplicate")&&d.row) return {ok:true,row:d.row};
+    if(d&&(d.result==="success"||d.result==="duplicate")&&(d.row||d.pendiente)) return {ok:true,row:d.pendiente?-1:d.row};
     code="S"+(d&&d.error?":"+String(d.error).slice(0,18):"");
   }catch(e){
     if(e&&e.message==="timeout") code="T";
@@ -462,7 +462,7 @@ async function sendVerified(payload,onProgress){
   return {ok:false,codes:codes};
 }
 // Estado del sistema: servidor listo, formulario al dia. Se revisa al abrir y al volver a la pestana.
-const CLIENT_VERSION=4;
+const CLIENT_VERSION=5;
 const PAGE_LOADED=Date.now();
 function recargarActualizado(){ location.replace(location.pathname+"?v="+Date.now()); }
 function formularioVacio(){
@@ -553,7 +553,7 @@ document.getElementById("mainForm").addEventListener("submit",e=>{
       if(ok){
         window._pendingId=null;
         resetUI();
-        showMsg("\u2713 Registro enviado y confirmado en el sistema."+(res.row?" Qued\u00f3 en la fila "+res.row+" del Sheet.":""),true);
+        showMsg(res.row>0?"\u2713 Registro enviado y confirmado en el sistema. Qued\u00f3 en la fila "+res.row+" del Sheet.":"\u2713 Registro recibido y guardado en el sistema. Aparecer\u00e1 en la hoja de solicitudes en unos minutos.",true);
       }else{
         showMsg("\u2717 NO SE ENVI\u00d3. El registro NO qued\u00f3 guardado. Revise su internet y presione \u201cReintentar env\u00edo\u201d. Sus datos siguen en pantalla. Si se repite, tome foto de este mensaje y env\u00edela a gerencia. C\u00f3digo: "+res.codes.join("-"),false);
       }
